@@ -31,6 +31,13 @@ public class PublicController {
     private final TagService tagService;
     private final FriendLinkService friendLinkService;
     private final CommentService commentService;
+    private final SiteConfigService siteConfigService;
+
+    @Operation(summary = "站点基础配置", description = "返回网站名称/图标、首页背景、导航栏文字/Logo、首页介绍、页脚文本等，前端按 key 取用")
+    @GetMapping("/site-config")
+    public Result<java.util.Map<String, String>> siteConfig() {
+        return Result.success(siteConfigService.getPublicConfig());
+    }
 
     @Operation(summary = "文章列表", description = "分页查询已发布文章，含缩略图/摘要/标题/点赞数/评论数/访问数/标签")
     @GetMapping("/articles")

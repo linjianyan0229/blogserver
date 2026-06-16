@@ -157,6 +157,21 @@ CREATE TABLE IF NOT EXISTS `comment`
     KEY `idx_user` (`user_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='评论表';
 
+-- ---------------------------- 站点基础配置表（key-value） ----------------------------
+CREATE TABLE IF NOT EXISTS `site_config`
+(
+    `id`           BIGINT       NOT NULL AUTO_INCREMENT COMMENT '配置ID',
+    `config_key`   VARCHAR(100) NOT NULL COMMENT '配置键',
+    `config_value` TEXT         DEFAULT NULL COMMENT '配置值',
+    `name`         VARCHAR(100) DEFAULT NULL COMMENT '配置中文名（后台展示）',
+    `type`         VARCHAR(20)  DEFAULT 'text' COMMENT '类型：text单行/textarea多行/image图片/color颜色',
+    `sort`         INT          DEFAULT 0 COMMENT '排序',
+    `create_time`  DATETIME     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `update_time`  DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `uk_config_key` (`config_key`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='站点基础配置表';
+
 -- ---------------------------- 接口限流规则表（API 管理配置） ----------------------------
 CREATE TABLE IF NOT EXISTS `api_rate_limit`
 (

@@ -46,8 +46,11 @@ public class ArticleDetailVO {
     @Schema(description = "作者头像")
     private String authorAvatar;
 
-    @Schema(description = "标签列表")
+    @Schema(description = "标签名称列表")
     private List<String> tags;
+
+    @Schema(description = "标签ID列表（编辑回显用，与 ArticleSaveDTO.tagIds 对应）")
+    private List<Long> tagIds;
 
     @Schema(description = "访问数")
     private Integer viewCount;
@@ -60,6 +63,9 @@ public class ArticleDetailVO {
 
     @Schema(description = "是否公开：0否 1是")
     private Integer isPublic;
+
+    @Schema(description = "是否置顶：0否 1是")
+    private Integer top;
 
     @Schema(description = "状态：0草稿 1已发布")
     private Integer status;

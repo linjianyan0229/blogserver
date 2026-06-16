@@ -222,8 +222,10 @@ public class ArticleService {
                 vo.setAuthorAvatar(author.getAvatar());
             }
         }
-        // 标签
-        vo.setTags(tagMapper.selectByArticleId(article.getId()).stream().map(Tag::getName).collect(Collectors.toList()));
+        // 标签（名称 + ID，供前端展示与编辑回显）
+        List<Tag> tagList = tagMapper.selectByArticleId(article.getId());
+        vo.setTags(tagList.stream().map(Tag::getName).collect(Collectors.toList()));
+        vo.setTagIds(tagList.stream().map(Tag::getId).collect(Collectors.toList()));
         // 目录
         vo.setToc(MarkdownUtil.extractToc(article.getContent()));
         return vo;

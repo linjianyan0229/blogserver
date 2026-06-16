@@ -57,7 +57,9 @@ VALUES (1, '系统管理', 'system', 1, 0, '/system', 'Setting', 1),
        (14, '接口限流', 'api:list', 2, 1, '/system/api-limit', 'Histogram', 14),
        (141, '新增限流规则', 'api:create', 3, 14, NULL, NULL, 1),
        (142, '修改限流规则', 'api:update', 3, 14, NULL, NULL, 2),
-       (143, '删除限流规则', 'api:delete', 3, 14, NULL, NULL, 3);
+       (143, '删除限流规则', 'api:delete', 3, 14, NULL, NULL, 3),
+       (15, '站点配置', 'config:list', 2, 1, '/system/site-config', 'Tools', 15),
+       (151, '修改站点配置', 'config:update', 3, 15, NULL, NULL, 1);
 
 -- ---------------------------- 角色-权限（ADMIN 拥有全部） ----------------------------
 INSERT IGNORE INTO `role_permission` (`role_id`, `permission_id`)
@@ -116,3 +118,13 @@ VALUES (1, '发送验证码限流', '/auth/send-code', 'POST', 'IP', 1, 60, 1, '
        (4, '文件上传限流', '/file/upload', 'USER', 'USER', 30, 60, 1, '每用户每60秒最多上传30张'),
        (5, '发表评论限流', '/comment', 'USER', 'USER', 20, 60, 1, '每用户每60秒最多评论20条'),
        (6, '点赞限流', '/public/articles/*/like', 'POST', 'IP', 60, 60, 1, '同一IP每60秒最多点赞60次');
+
+-- ---------------------------- 站点基础配置（前端首页/导航/页脚等） ----------------------------
+INSERT IGNORE INTO `site_config` (`config_key`, `config_value`, `name`, `type`, `sort`)
+VALUES ('site_name', '我的博客', '网站名称', 'text', 1),
+       ('site_icon', 'https://picsum.photos/seed/favicon/64', '网站图标(favicon)', 'image', 2),
+       ('home_background', 'https://picsum.photos/seed/homebg/1920/600', '首页背景图', 'image', 3),
+       ('nav_logo', 'https://picsum.photos/seed/logo/120/40', '导航栏Logo', 'image', 4),
+       ('nav_title', '我的博客', '导航栏文字', 'text', 5),
+       ('home_intro', '欢迎来到我的博客，这里记录技术与生活的点滴。', '首页介绍文本', 'textarea', 6),
+       ('footer_text', 'Copyright © 2026 我的博客 · 基于 Spring Boot 构建', '页脚文本', 'textarea', 7);

@@ -52,9 +52,15 @@ public class ArticleListVO {
     @Schema(description = "是否置顶：0否 1是")
     private Integer top;
 
+    @Schema(description = "状态：0草稿 1已发布（后台列表区分草稿/已发布）")
+    private Integer status;
+
     @Schema(description = "标签列表")
     private List<String> tags;
 
     @Schema(description = "发布时间")
     private LocalDateTime createTime;
+
+    @Schema(description = "更新时间")
+    private LocalDateTime updateTime;
 }

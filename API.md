@@ -95,6 +95,18 @@
 ### GET `/public/categories`、`/public/tags`、`/public/links`
 无参数，分别返回全部分类、全部标签、显示中的友链。
 
+### GET `/public/site-config` 站点基础配置
+无参数，返回 `key→value` 的配置 Map，前端按 key 取用。内置键：
+| key | 说明 | 类型 |
+|-----|------|------|
+| site_name | 网站名称 | text |
+| site_icon | 网站图标(favicon) | image |
+| home_background | 首页背景图 | image |
+| nav_logo | 导航栏Logo | image |
+| nav_title | 导航栏文字 | text |
+| home_intro | 首页介绍文本 | textarea |
+| footer_text | 页脚文本 | textarea |
+
 ---
 
 ## 三、用户中心（需登录）
@@ -151,7 +163,7 @@
 | 方法 | 路径 | 权限 |
 |------|------|------|
 | GET | `/admin/articles?page&size&categoryId&tagId&keyword&status` | article:list |
-| GET | `/admin/articles/{id}` | article:list |
+| GET | `/admin/articles/{id}` | article:list |（编辑回显：返回全部表字段 + `tagIds`/`top`/`status`/`toc`，与下方保存字段一一对应）
 | POST | `/admin/articles` | article:create |
 | PUT | `/admin/articles` | article:update |
 | DELETE | `/admin/articles/{id}` | article:delete |
@@ -248,6 +260,21 @@
 
 > 规则修改后约 10 秒内生效（本地缓存刷新），超限返回 429。
 
+### 站点配置管理（`config:*`）
+| 方法 | 路径 | 权限 | 说明 |
+|------|------|------|------|
+| GET | `/admin/site-config` | config:list | 配置列表（含中文名/类型，供表单渲染） |
+| PUT | `/admin/site-config` | config:update | 批量更新（请求体为数组），修改即时生效 |
+
+批量更新请求体（`List`），每项字段：
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|:--:|------|
+| configKey | string | ✓ | 配置键（如 site_name） |
+| configValue | string | - | 配置值 |
+| name | string | - | 中文名（新增配置项时传） |
+| type | string | - | text/textarea/image/color（新增时传） |
+| sort | int | - | 排序 |
+
 ---
 
 ## 七、权限编码一览
@@ -258,6 +285,7 @@
 | 角色 | role:list / role:create / role:update / role:delete / role:assign |
 | 权限 | permission:list |
 | 接口限流 | api:list / api:create / api:update / api:delete |
+| 站点配置 | config:list / config:update |
 | 文章 | article:list / article:create / article:update / article:delete |
 | 分类 | category:list / category:create / category:update / category:delete |
 | 标签 | tag:list / tag:create / tag:update / tag:delete |
