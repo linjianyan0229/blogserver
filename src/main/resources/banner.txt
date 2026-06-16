@@ -1,0 +1,8 @@
+${AnsiColor.BRIGHT_CYAN}
+  ____  _             ____
+ | __ )| | ___   __ _/ ___|  ___ _ ____   _____ _ __
+ |  _ \| |/ _ \ / _` \___ \ / _ \ '__\ \ / / _ \ '__|
+ | |_) | | (_) | (_| |___) |  __/ |   \ V /  __/ |
+ |____/|_|\___/ \__, |____/ \___|_|    \_/ \___|_|
+                |___/
+${AnsiColor.BRIGHT_YELLOW} :: 博客后端系统 Blog Server ::   ${AnsiColor.BRIGHT_GREEN}(Spring Boot ${spring-boot.version})${AnsiColor.DEFAULT}
