@@ -146,6 +146,22 @@
 
 ---
 
+## 四点八、友链申请（需登录）
+
+### POST `/link-apply` 提交友链申请
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|:--:|------|
+| name | string | ✓ | 网站名称 |
+| url | string | ✓ | 网站地址 |
+| logo | string | - | 网站LOGO |
+| description | string | - | 网站描述 |
+| applyEmail | string | - | 联系邮箱（合法邮箱格式） |
+
+> 提交后进入「待审核」，管理员审核通过后自动加入友链并展示。限流：每用户每小时 5 次。
+
+### GET `/link-apply/mine` 我的友链申请记录
+无参数，返回当前用户的申请列表及审核状态（PENDING/APPROVED/REJECTED）。
+
 ## 五、文件上传（需登录）
 
 ### POST `/file/upload` 上传图片
@@ -260,6 +276,13 @@
 
 > 规则修改后约 10 秒内生效（本地缓存刷新），超限返回 429。
 
+### 友链申请审核（`link:audit`）
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/admin/link-applies?status&page&size` | 申请分页，status 可选 PENDING/APPROVED/REJECTED |
+| POST | `/admin/link-applies/{id}/approve` | 审核通过（自动写入友链并显示） |
+| POST | `/admin/link-applies/{id}/reject?remark=拒绝原因` | 审核拒绝 |
+
 ### 站点配置管理（`config:*`）
 | 方法 | 路径 | 权限 | 说明 |
 |------|------|------|------|
@@ -290,6 +313,6 @@
 | 分类 | category:list / category:create / category:update / category:delete |
 | 标签 | tag:list / tag:create / tag:update / tag:delete |
 | 评论 | comment:list / comment:delete |
-| 友链 | link:list / link:create / link:update / link:delete |
+| 友链 | link:list / link:create / link:update / link:delete / link:audit（友链申请审核） |
 
 > ADMIN 默认拥有全部权限；USER 仅可用用户中心、评论、文件上传。

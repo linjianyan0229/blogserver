@@ -157,6 +157,25 @@ CREATE TABLE IF NOT EXISTS `comment`
     KEY `idx_user` (`user_id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='评论表';
 
+-- ---------------------------- 友链申请表 ----------------------------
+CREATE TABLE IF NOT EXISTS `friend_link_apply`
+(
+    `id`            BIGINT       NOT NULL AUTO_INCREMENT COMMENT '申请ID',
+    `name`          VARCHAR(100) NOT NULL COMMENT '网站名称',
+    `url`           VARCHAR(255) NOT NULL COMMENT '网站地址',
+    `logo`          VARCHAR(255) DEFAULT NULL COMMENT '网站LOGO',
+    `description`   VARCHAR(255) DEFAULT NULL COMMENT '网站描述',
+    `apply_email`   VARCHAR(100) DEFAULT NULL COMMENT '联系邮箱',
+    `apply_user_id` BIGINT       DEFAULT NULL COMMENT '申请用户ID',
+    `status`        VARCHAR(10)  DEFAULT 'PENDING' COMMENT '审核状态：PENDING待审核 APPROVED已通过 REJECTED已拒绝',
+    `audit_remark`  VARCHAR(255) DEFAULT NULL COMMENT '审核备注/拒绝原因',
+    `create_time`   DATETIME     DEFAULT CURRENT_TIMESTAMP COMMENT '申请时间',
+    `update_time`   DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_status` (`status`),
+    KEY `idx_apply_user` (`apply_user_id`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='友链申请表';
+
 -- ---------------------------- 站点基础配置表（key-value） ----------------------------
 CREATE TABLE IF NOT EXISTS `site_config`
 (

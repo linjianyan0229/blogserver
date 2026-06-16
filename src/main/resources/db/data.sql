@@ -54,6 +54,7 @@ VALUES (1, '系统管理', 'system', 1, 0, '/system', 'Setting', 1),
        (251, '新增友链', 'link:create', 3, 25, NULL, NULL, 1),
        (252, '修改友链', 'link:update', 3, 25, NULL, NULL, 2),
        (253, '删除友链', 'link:delete', 3, 25, NULL, NULL, 3),
+       (254, '友链审核', 'link:audit', 3, 25, NULL, NULL, 4),
        (14, '接口限流', 'api:list', 2, 1, '/system/api-limit', 'Histogram', 14),
        (141, '新增限流规则', 'api:create', 3, 14, NULL, NULL, 1),
        (142, '修改限流规则', 'api:update', 3, 14, NULL, NULL, 2),
@@ -117,7 +118,8 @@ VALUES (1, '发送验证码限流', '/auth/send-code', 'POST', 'IP', 1, 60, 1, '
        (3, '注册限流', '/auth/register', 'POST', 'IP', 5, 300, 1, '同一IP每5分钟最多注册5次'),
        (4, '文件上传限流', '/file/upload', 'USER', 'USER', 30, 60, 1, '每用户每60秒最多上传30张'),
        (5, '发表评论限流', '/comment', 'USER', 'USER', 20, 60, 1, '每用户每60秒最多评论20条'),
-       (6, '点赞限流', '/public/articles/*/like', 'POST', 'IP', 60, 60, 1, '同一IP每60秒最多点赞60次');
+       (6, '点赞限流', '/public/articles/*/like', 'POST', 'IP', 60, 60, 1, '同一IP每60秒最多点赞60次'),
+       (7, '友链申请限流', '/link-apply', 'POST', 'USER', 5, 3600, 1, '每用户每小时最多申请5次');
 
 -- ---------------------------- 站点基础配置（前端首页/导航/页脚等） ----------------------------
 INSERT IGNORE INTO `site_config` (`config_key`, `config_value`, `name`, `type`, `sort`)
