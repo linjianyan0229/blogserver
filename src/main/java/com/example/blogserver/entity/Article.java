@@ -52,6 +52,9 @@ public class Article implements Serializable {
     @Schema(description = "是否置顶：0否 1是")
     private Integer top;
 
+    @Schema(description = "访问密码（空=无需密码）")
+    private String password;
+
     @Schema(description = "状态：0草稿 1已发布")
     private Integer status;
 

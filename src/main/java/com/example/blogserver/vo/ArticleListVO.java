@@ -55,6 +55,9 @@ public class ArticleListVO {
     @Schema(description = "状态：0草稿 1已发布（后台列表区分草稿/已发布）")
     private Integer status;
 
+    @Schema(description = "是否需要密码访问")
+    private Boolean hasPassword;
+
     @Schema(description = "标签列表")
     private List<String> tags;
 

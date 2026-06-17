@@ -12,6 +12,7 @@ import com.example.blogserver.vo.ArticleListVO;
 import com.example.blogserver.vo.CommentVO;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -49,6 +50,13 @@ public class PublicController {
     @GetMapping("/articles/{id}")
     public Result<ArticleDetailVO> articleDetail(@Parameter(description = "文章ID") @PathVariable Long id) {
         return Result.success(articleService.getPublicDetail(id));
+    }
+
+    @Operation(summary = "解锁加密文章", description = "对设有访问密码的文章，输入正确密码后返回完整正文")
+    @PostMapping("/articles/{id}/unlock")
+    public Result<ArticleDetailVO> unlock(@Parameter(description = "文章ID", required = true) @PathVariable Long id,
+                                          @Valid @RequestBody com.example.blogserver.dto.article.ArticleUnlockDTO dto) {
+        return Result.success("解锁成功", articleService.unlock(id, dto.getPassword()));
     }
 
     @Operation(summary = "文章点赞", description = "返回最新点赞数")

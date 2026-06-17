@@ -120,6 +120,7 @@ CREATE TABLE IF NOT EXISTS `article`
     `comment_count` INT          DEFAULT 0 COMMENT '评论数',
     `is_public`     TINYINT      DEFAULT 1 COMMENT '是否公开（游客可见）：0否 1是',
     `top`           TINYINT      DEFAULT 0 COMMENT '是否置顶：0否 1是',
+    `password`      VARCHAR(100) DEFAULT NULL COMMENT '访问密码（空=无需密码）',
     `status`        TINYINT      DEFAULT 1 COMMENT '状态：0草稿 1已发布',
     `create_time`   DATETIME     DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
     `update_time`   DATETIME     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
@@ -224,3 +225,26 @@ CREATE TABLE IF NOT EXISTS `friend_link`
     `deleted`     TINYINT      DEFAULT 0 COMMENT '逻辑删除：0未删 1已删',
     PRIMARY KEY (`id`)
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='友情链接表';
+
+-- ---------------------------- 网站访问日志表 ----------------------------
+CREATE TABLE IF NOT EXISTS `visit_log`
+(
+    `id`          BIGINT       NOT NULL AUTO_INCREMENT COMMENT '访问ID',
+    `ip`          VARCHAR(64)  DEFAULT NULL COMMENT '访客IP',
+    `path`        VARCHAR(255) DEFAULT NULL COMMENT '访问路径',
+    `referer`     VARCHAR(512) DEFAULT NULL COMMENT '来源页',
+    `user_agent`  VARCHAR(512) DEFAULT NULL COMMENT '浏览器UA',
+    `user_id`     BIGINT       DEFAULT NULL COMMENT '登录用户ID（游客为空）',
+    `visit_date`  DATE         DEFAULT NULL COMMENT '访问日期（用于按天统计）',
+    `create_time` DATETIME     DEFAULT CURRENT_TIMESTAMP COMMENT '访问时间',
+    PRIMARY KEY (`id`),
+    KEY `idx_visit_date` (`visit_date`),
+    KEY `idx_ip` (`ip`)
+) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4 COMMENT ='网站访问日志表';
+
+-- ============================================================
+--  增量列迁移（针对已存在的表，CREATE IF NOT EXISTS 不会补列）
+--  配合 application.yml 的 spring.sql.init.continue-on-error=true，
+--  列已存在时报错被忽略，首次运行则补列。
+-- ============================================================
+ALTER TABLE `article` ADD COLUMN `password` VARCHAR(100) DEFAULT NULL COMMENT '访问密码（空=无需密码）';

@@ -27,7 +27,8 @@ public enum ResultCode {
     OLD_PASSWORD_ERROR(1007, "原密码错误"),
     TOKEN_INVALID(1008, "令牌无效或已过期"),
     RESOURCE_NOT_EXIST(1009, "数据不存在"),
-    ARTICLE_NOT_PUBLIC(1010, "该文章未公开，请登录后查看");
+    ARTICLE_NOT_PUBLIC(1010, "该文章未公开，请登录后查看"),
+    ARTICLE_PASSWORD_ERROR(1011, "文章访问密码错误");
 
     private final Integer code;
     private final String message;

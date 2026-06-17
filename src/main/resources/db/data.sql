@@ -60,7 +60,8 @@ VALUES (1, '系统管理', 'system', 1, 0, '/system', 'Setting', 1),
        (142, '修改限流规则', 'api:update', 3, 14, NULL, NULL, 2),
        (143, '删除限流规则', 'api:delete', 3, 14, NULL, NULL, 3),
        (15, '站点配置', 'config:list', 2, 1, '/system/site-config', 'Tools', 15),
-       (151, '修改站点配置', 'config:update', 3, 15, NULL, NULL, 1);
+       (151, '修改站点配置', 'config:update', 3, 15, NULL, NULL, 1),
+       (16, '访问统计', 'visit:list', 2, 1, '/system/visit', 'DataLine', 16);
 
 -- ---------------------------- 角色-权限（ADMIN 拥有全部） ----------------------------
 INSERT IGNORE INTO `role_permission` (`role_id`, `permission_id`)
@@ -119,7 +120,8 @@ VALUES (1, '发送验证码限流', '/auth/send-code', 'POST', 'IP', 1, 60, 1, '
        (4, '文件上传限流', '/file/upload', 'USER', 'USER', 30, 60, 1, '每用户每60秒最多上传30张'),
        (5, '发表评论限流', '/comment', 'USER', 'USER', 20, 60, 1, '每用户每60秒最多评论20条'),
        (6, '点赞限流', '/public/articles/*/like', 'POST', 'IP', 60, 60, 1, '同一IP每60秒最多点赞60次'),
-       (7, '友链申请限流', '/link-apply', 'POST', 'USER', 5, 3600, 1, '每用户每小时最多申请5次');
+       (7, '友链申请限流', '/link-apply', 'POST', 'USER', 5, 3600, 1, '每用户每小时最多申请5次'),
+       (8, '访问上报限流', '/public/visit', 'POST', 'IP', 120, 60, 1, '同一IP每60秒最多上报120次');
 
 -- ---------------------------- 站点基础配置（前端首页/导航/页脚等） ----------------------------
 INSERT IGNORE INTO `site_config` (`config_key`, `config_value`, `name`, `type`, `sort`)

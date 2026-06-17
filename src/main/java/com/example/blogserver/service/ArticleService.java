@@ -52,6 +52,38 @@ public class ArticleService {
      */
     @Transactional(rollbackFor = Exception.class)
     public ArticleDetailVO getPublicDetail(Long id) {
+        Article article = loadPublishedAndCheckPublic(id);
+        // 受密码保护：返回元信息但隐藏正文与目录，提示前端需要输入密码
+        if (StringUtils.hasText(article.getPassword())) {
+            ArticleDetailVO vo = toDetailVO(article);
+            vo.setNeedPassword(true);
+            vo.setContent(null);
+            vo.setToc(null);
+            return vo;
+        }
+        increaseView(article);
+        ArticleDetailVO vo = toDetailVO(article);
+        vo.setNeedPassword(false);
+        return vo;
+    }
+
+    /**
+     * 输入密码解锁受保护文章，返回完整正文
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public ArticleDetailVO unlock(Long id, String password) {
+        Article article = loadPublishedAndCheckPublic(id);
+        if (StringUtils.hasText(article.getPassword())
+                && !article.getPassword().equals(password)) {
+            throw new BusinessException(ResultCode.ARTICLE_PASSWORD_ERROR);
+        }
+        increaseView(article);
+        ArticleDetailVO vo = toDetailVO(article);
+        vo.setNeedPassword(false);
+        return vo;
+    }
+
+    private Article loadPublishedAndCheckPublic(Long id) {
         Article article = articleMapper.selectById(id);
         if (article == null || article.getStatus() == null || article.getStatus() != 1) {
             throw new BusinessException(ResultCode.RESOURCE_NOT_EXIST);
@@ -60,10 +92,12 @@ public class ArticleService {
         if (!isPublic && !SecurityUtils.isAuthenticated()) {
             throw new BusinessException(ResultCode.ARTICLE_NOT_PUBLIC);
         }
-        // 访问数 +1
-        articleMapper.incrViewCount(id);
+        return article;
+    }
+
+    private void increaseView(Article article) {
+        articleMapper.incrViewCount(article.getId());
         article.setViewCount((article.getViewCount() == null ? 0 : article.getViewCount()) + 1);
-        return toDetailVO(article);
     }
 
     /**
@@ -95,7 +129,10 @@ public class ArticleService {
         if (article == null) {
             throw new BusinessException(ResultCode.RESOURCE_NOT_EXIST);
         }
-        return toDetailVO(article);
+        ArticleDetailVO vo = toDetailVO(article);
+        // 后台编辑回显需要看到当前访问密码
+        vo.setPassword(article.getPassword());
+        return vo;
     }
 
     /**
@@ -200,13 +237,16 @@ public class ArticleService {
                 vo.setAuthorAvatar(author.getAvatar());
             }
             vo.setTags(tagMapper.selectByArticleId(a.getId()).stream().map(Tag::getName).collect(Collectors.toList()));
+            vo.setHasPassword(StringUtils.hasText(a.getPassword()));
             return vo;
         }).collect(Collectors.toList());
     }
 
     private ArticleDetailVO toDetailVO(Article article) {
         ArticleDetailVO vo = new ArticleDetailVO();
-        BeanUtils.copyProperties(article, vo);
+        // 忽略 password，避免公开接口泄露文章访问密码（后台编辑回显另行显式设置）
+        BeanUtils.copyProperties(article, vo, "password");
+        vo.setHasPassword(StringUtils.hasText(article.getPassword()));
         // 分类名
         if (article.getCategoryId() != null) {
             Category category = categoryMapper.selectById(article.getCategoryId());

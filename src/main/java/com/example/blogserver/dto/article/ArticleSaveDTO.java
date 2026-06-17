@@ -42,6 +42,9 @@ public class ArticleSaveDTO {
     @Schema(description = "是否置顶：0否 1是", example = "0")
     private Integer top = 0;
 
+    @Schema(description = "访问密码（设置后读全文需输入；传空字符串表示清除密码；不传表示不修改）")
+    private String password;
+
     @Schema(description = "状态：0草稿 1已发布", example = "1")
     private Integer status = 1;
 }

@@ -67,6 +67,15 @@ public class ArticleDetailVO {
     @Schema(description = "是否置顶：0否 1是")
     private Integer top;
 
+    @Schema(description = "是否需要密码访问")
+    private Boolean hasPassword;
+
+    @Schema(description = "是否需要输入密码（true 时 content/toc 被隐藏，需调用解锁接口）")
+    private Boolean needPassword;
+
+    @Schema(description = "访问密码（仅后台编辑回显返回，公开接口不返回）")
+    private String password;
+
     @Schema(description = "状态：0草稿 1已发布")
     private Integer status;
 

@@ -79,6 +79,15 @@
 
 公开文章游客可看；非公开（isPublic=0）需登录否则返回 1010。访问数自动 +1。
 返回含：`content(正文)、toc(目录：level/text/anchor)、thumbnail(顶部背景)、tags、categoryName、authorName/authorAvatar、各计数`。
+若文章设有访问密码，返回 `needPassword=true` 且 `content/toc` 为空，需调用下方解锁接口；列表项亦有 `hasPassword` 标识。
+
+### POST `/public/articles/{id}/unlock` 解锁加密文章
+| 字段 | 类型 | 必填 | 说明 |
+|------|------|:--:|------|
+| id | long(path) | ✓ | 文章ID |
+| password | string(body) | ✓ | 访问密码 |
+
+密码正确返回完整正文（访问数 +1）；错误返回 code 1011。
 
 ### POST `/public/articles/{id}/like` 点赞
 | 参数 | 类型 | 必填 | 说明 |
@@ -163,6 +172,20 @@
 
 ### GET `/link-apply/mine` 我的友链申请记录
 无参数，返回当前用户的申请列表及审核状态（PENDING/APPROVED/REJECTED）。
+
+## 四点九、访问统计（公开）
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/public/visit/ip` | 返回当前请求的客户端 IP |
+| POST | `/public/visit?path=页面路径` | 上报一次访问（记录IP/路径），返回最新总访问量(PV)。限流：同IP 120次/60秒 |
+| GET | `/public/visit/stats` | 网站访问量：`totalPv / totalUv / todayPv / todayUv`（UV 按 IP 去重） |
+
+后台（权限 `visit:list`）：
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/admin/visit/stats` | 访问量统计 |
+| GET | `/admin/visit/logs?ip&page&size` | 访问日志分页（含IP，可按 IP 模糊过滤） |
 
 ## 五、文件上传（需登录）
 
