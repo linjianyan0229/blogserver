@@ -107,6 +107,8 @@
 | home_intro | 首页介绍文本 | textarea |
 | footer_text | 页脚文本 | textarea |
 
+> 注意：`mail_` 前缀的邮箱(SMTP)私密配置**不会**从该公开接口返回，仅后台可见可改。
+
 ---
 
 ## 三、用户中心（需登录）
@@ -286,8 +288,19 @@
 ### 站点配置管理（`config:*`）
 | 方法 | 路径 | 权限 | 说明 |
 |------|------|------|------|
-| GET | `/admin/site-config` | config:list | 配置列表（含中文名/类型，供表单渲染） |
+| GET | `/admin/site-config` | config:list | 配置列表（含中文名/类型 + 邮箱配置，供表单渲染） |
 | PUT | `/admin/site-config` | config:update | 批量更新（请求体为数组），修改即时生效 |
+| POST | `/admin/site-config/test-mail?to=邮箱` | config:update | 用当前邮箱配置发测试邮件，验证是否可用 |
+
+**邮箱(SMTP)在线配置键**（后台可改，改完即时生效、无需重启；留空则回退 application.yml）：
+| key | 说明 |
+|-----|------|
+| mail_host | 邮件服务器，如 smtp.qq.com |
+| mail_port | 端口，如 465 |
+| mail_username | 发件邮箱（=SMTP用户名） |
+| mail_password | SMTP 授权码 |
+| mail_from_name | 发件人显示名 |
+| mail_ssl_enable | 是否启用 SSL（true/false） |
 
 批量更新请求体（`List`），每项字段：
 | 字段 | 类型 | 必填 | 说明 |

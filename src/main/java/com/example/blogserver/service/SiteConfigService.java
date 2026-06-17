@@ -24,6 +24,9 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class SiteConfigService {
 
+    /** 私密配置前缀：以此开头的键不会从公开接口返回（如邮箱 SMTP 配置） */
+    private static final String PRIVATE_PREFIX = "mail_";
+
     private final SiteConfigMapper siteConfigMapper;
 
     /** 公开配置缓存（60 秒），后台更新时主动失效 */
@@ -41,10 +44,23 @@ public class SiteConfigService {
         return cache.get("all", k -> {
             Map<String, String> map = new LinkedHashMap<>();
             for (SiteConfig c : listAll()) {
+                // 私密键（如邮箱配置）不对外暴露
+                if (c.getConfigKey() != null && c.getConfigKey().startsWith(PRIVATE_PREFIX)) {
+                    continue;
+                }
                 map.put(c.getConfigKey(), c.getConfigValue());
             }
             return map;
         });
+    }
+
+    /**
+     * 读取单个配置值（含私密项，仅供服务端内部使用，如邮件服务）
+     */
+    public String getValue(String key) {
+        SiteConfig config = siteConfigMapper.selectOne(
+                Wrappers.<SiteConfig>lambdaQuery().eq(SiteConfig::getConfigKey, key));
+        return config == null ? null : config.getConfigValue();
     }
 
     /**

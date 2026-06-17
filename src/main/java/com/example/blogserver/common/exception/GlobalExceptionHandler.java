@@ -55,6 +55,17 @@ public class GlobalExceptionHandler {
     }
 
     /**
+     * 方法参数校验异常（@Validated + @RequestParam/@PathVariable 上的约束）
+     */
+    @ExceptionHandler(jakarta.validation.ConstraintViolationException.class)
+    public Result<Void> handleConstraintViolation(jakarta.validation.ConstraintViolationException e) {
+        String msg = e.getConstraintViolations().stream()
+                .map(jakarta.validation.ConstraintViolation::getMessage)
+                .collect(Collectors.joining("；"));
+        return Result.error(ResultCode.PARAM_ERROR.getCode(), msg);
+    }
+
+    /**
      * 登录凭证错误
      */
     @ExceptionHandler(BadCredentialsException.class)

@@ -130,3 +130,12 @@ VALUES ('site_name', '我的博客', '网站名称', 'text', 1),
        ('nav_title', '我的博客', '导航栏文字', 'text', 5),
        ('home_intro', '欢迎来到我的博客，这里记录技术与生活的点滴。', '首页介绍文本', 'textarea', 6),
        ('footer_text', 'Copyright © 2026 我的博客 · 基于 Spring Boot 构建', '页脚文本', 'textarea', 7);
+
+-- 邮箱(SMTP)配置：mail_ 前缀为私密项，不会从公开接口返回；值留空则回退 application.yml
+INSERT IGNORE INTO `site_config` (`config_key`, `config_value`, `name`, `type`, `sort`)
+VALUES ('mail_host', 'smtp.qq.com', '邮件服务器(SMTP)', 'text', 101),
+       ('mail_port', '465', 'SMTP端口', 'text', 102),
+       ('mail_username', '', '发件邮箱(留空用配置文件)', 'text', 103),
+       ('mail_password', '', 'SMTP授权码(留空用配置文件)', 'password', 104),
+       ('mail_from_name', '博客系统', '发件人名称', 'text', 105),
+       ('mail_ssl_enable', 'true', '启用SSL(true/false)', 'text', 106);

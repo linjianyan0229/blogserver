@@ -1,38 +1,96 @@
 package com.example.blogserver.service;
 
+import com.example.blogserver.common.exception.BusinessException;
 import com.example.blogserver.config.properties.MailProperties;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.core.env.Environment;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.util.Properties;
 
 /**
  * 邮件发送服务（SMTP）
+ * 邮箱配置优先取站点配置（site_config 的 mail_* 键，可在后台在线修改），
+ * 留空则回退到 application.yml 的 spring.mail.*，改完即时生效、无需重启。
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class MailService {
 
-    private final JavaMailSender mailSender;
     private final MailProperties mailProperties;
+    private final SiteConfigService siteConfigService;
+    private final Environment env;
 
-    @Value("${spring.mail.username}")
-    private String from;
+    /**
+     * 根据当前配置（DB 优先，yml 回退）构建邮件发送器
+     */
+    private JavaMailSenderImpl buildSender() {
+        String host = effective("mail_host", "spring.mail.host", "smtp.qq.com");
+        int port = parsePort(effective("mail_port", "spring.mail.port", "465"));
+        String username = effective("mail_username", "spring.mail.username", "");
+        String password = effective("mail_password", "spring.mail.password", "");
+        boolean ssl = Boolean.parseBoolean(
+                effective("mail_ssl_enable", "spring.mail.properties.mail.smtp.ssl.enable", "true"));
+
+        JavaMailSenderImpl sender = new JavaMailSenderImpl();
+        sender.setHost(host);
+        sender.setPort(port);
+        sender.setUsername(username);
+        sender.setPassword(password);
+        sender.setDefaultEncoding("UTF-8");
+        Properties props = sender.getJavaMailProperties();
+        props.put("mail.smtp.auth", "true");
+        if (ssl) {
+            sender.setProtocol("smtps");
+            props.put("mail.smtp.ssl.enable", "true");
+            props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+        } else {
+            sender.setProtocol("smtp");
+        }
+        return sender;
+    }
+
+    /** 发件邮箱（=SMTP 用户名） */
+    private String getFrom() {
+        return effective("mail_username", "spring.mail.username", "");
+    }
+
+    /** 发件人显示名 */
+    private String getFromName() {
+        String name = siteConfigService.getValue("mail_from_name");
+        return StringUtils.hasText(name) ? name : mailProperties.getFromName();
+    }
+
+    /**
+     * 取有效配置：DB(site_config) 非空优先，否则取 application.yml，再否则默认值
+     */
+    private String effective(String dbKey, String envKey, String defaultValue) {
+        String dbValue = siteConfigService.getValue(dbKey);
+        if (StringUtils.hasText(dbValue)) {
+            return dbValue.trim();
+        }
+        String envValue = env.getProperty(envKey);
+        return StringUtils.hasText(envValue) ? envValue : defaultValue;
+    }
+
+    private int parsePort(String port) {
+        try {
+            return Integer.parseInt(port.trim());
+        } catch (NumberFormatException e) {
+            return 465;
+        }
+    }
 
     /**
      * 发送验证码邮件（HTML）
-     *
-     * @param to      收件邮箱
-     * @param code    验证码
-     * @param subject 邮件主题
-     * @param scene   场景描述（注册/重置密码）
      */
     public void sendVerifyCode(String to, String code, String subject, String scene) {
         String html = """
@@ -50,21 +108,37 @@ public class MailService {
     }
 
     /**
+     * 发送测试邮件（后台验证邮箱配置是否可用）
+     */
+    public void sendTest(String to) {
+        sendHtml(to, "【博客系统】邮箱配置测试",
+                "<p>这是一封测试邮件，如果你收到它，说明当前邮箱(SMTP)配置可正常发送。</p>");
+    }
+
+    /**
      * 发送 HTML 邮件
      */
     public void sendHtml(String to, String subject, String htmlContent) {
+        String from = getFrom();
+        if (!StringUtils.hasText(from)) {
+            throw new BusinessException("发件邮箱未配置，请在后台站点配置中设置 mail_username 或在配置文件中配置 spring.mail.username");
+        }
         try {
-            MimeMessage message = mailSender.createMimeMessage();
+            JavaMailSenderImpl sender = buildSender();
+            MimeMessage message = sender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-            helper.setFrom(from, mailProperties.getFromName());
+            helper.setFrom(from, getFromName());
             helper.setTo(to);
             helper.setSubject(subject);
             helper.setText(htmlContent, true);
-            mailSender.send(message);
+            sender.send(message);
             log.info("邮件发送成功 -> {}（{}）", to, subject);
         } catch (MessagingException | UnsupportedEncodingException e) {
             log.error("邮件发送失败 -> {}：{}", to, e.getMessage());
-            throw new RuntimeException("邮件发送失败，请检查邮箱配置：" + e.getMessage());
+            throw new BusinessException("邮件发送失败，请检查邮箱配置：" + e.getMessage());
+        } catch (org.springframework.mail.MailException e) {
+            log.error("邮件发送失败 -> {}：{}", to, e.getMessage());
+            throw new BusinessException("邮件发送失败，请检查邮箱配置：" + e.getMessage());
         }
     }
 }
